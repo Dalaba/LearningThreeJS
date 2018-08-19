@@ -1,0 +1,111 @@
+<html>
+	<head>
+		<title>Geometry example</title>
+		<style>
+			body {margin: 0;}
+			canvas {width: 100%; height: 100%}
+		</style>
+	</head>
+	<body>
+		<script src="lib/three.min.js"></script>
+		<script>
+			// 创建渲染器
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.setClearColor(0xffffff);
+			//让浏览器找到这个画布
+			document.body.appendChild(renderer.domElement); 
+
+			// 创建场景世界
+			var scene = new THREE.Scene();
+			// 准备在这个世界中添加一个meshObj
+
+			// Base Geometry
+			var geometry1 = new THREE.Geometry();
+			geometry1.vertices.push(
+				new THREE.Vector3(-1, -1, 1),
+				new THREE.Vector3(1, -1, 1),
+				new THREE.Vector3(1, 1, 1),
+				new THREE.Vector3(-1, 1, 1),
+			);
+			geometry1.faces.push(new THREE.Face3(0, 1, 2, 1, 0, 3));
+
+			// 效率更高的Geometry Buffer
+			var geometry2 = new THREE.BufferGeometry();
+			var vertices = new Float32Array( [
+				-1.0, -1.0,  1.0,
+				 1.0, -1.0,  1.0,
+				 1.0,  1.0,  1.0,
+				-1.0,  1.0,  1.0
+			] );
+			var indexs = new Uint16Array([0, 1, 2, 1, 0, 3]);
+			geometry2.addAttribute( 'position', new THREE.BufferAttribute(vertices, 3));
+			geometry2.setIndex(new THREE.BufferAttribute(indexs, 1));
+
+			// 长方体Box(width, height, depth, widthSeg, heightSeg, depthSeg)
+			var boxGeo1 = new THREE.BoxGeometry(1, 1, 1);
+			var boxGeo2 = new THREE.BoxBufferGeometry(1, 1, 1);
+			// 圆盘或扇形盘Circle(radius, segments, 起始弧度(默认0，为3点方向), 总弧度(默认2PI，正好一个圆))
+			var circleGeo1 = new THREE.CircleGeometry(1, 10);
+			var circleGeo2 = new THREE.CircleBufferGeometry(1, 10);
+			// 平面 PlaneGeometry, PlaneBufferGeometry
+			// 二维环 RingGeometry, RingBufferGeometry
+			// 三维环 TorusGeometry, TorusBufferGeometry
+			// 球体 SphereGeometry, SphereBufferGeometry
+			// 圆锥体 ConeGeometry, ConeBufferGeometry
+			// 圆柱体 CylinderGeometry, CylinderBufferGeometry
+			// 管道, 参数是一个path, TubeGeometry, TubeBufferGeometry
+			// 四面体 TetrahedronGeometry, TetrahedronBufferGeometry
+			// 八面体 OctahedronGeometry, OctahedronBufferGeometry
+			// 十二面体 DodecahedronGeometry, DodecahedronBufferGeometry
+			// 二十面体 IcosahedronGeometry, IcosahedronBufferGeometry
+			// 多面体，生成上述各面体的底层实现 PolyhedronGeometry, PolyhedronBufferGeometry
+			
+			//--------复杂类型--------
+			// 二维图形shape ShapeGeometry, ShapeBufferGeometry
+			var x = 0, y = 0;
+			var heartShape = new THREE.Shape();
+			heartShape.moveTo( x + 5, y + 5 );
+			heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
+			heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
+			heartShape.bezierCurveTo( x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19 );
+			heartShape.bezierCurveTo( x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7 );
+			heartShape.bezierCurveTo( x + 16, y + 7, x + 16, y, x + 10, y );
+			heartShape.bezierCurveTo( x + 7, y, x + 5, y + 5, x + 5, y + 5 );
+			var shapeGeo = new THREE.ShapeBufferGeometry(heartShape);
+			// 拉伸图形 ExtrudeGeometry, ExtrudeBufferGeometry, 第一个参数是shape，第二个参数为拉伸配置
+			// 在xy平面的二维点顺序相连，再绕y皱一周，像做陶艺一样 LatheGeometry, LatheBufferGeometryß
+			// 字符图形 TextBufferGeometry, TextBufferGeometry, 以Font为参数
+			
+			//--------辅助类型--------
+			// 画边 EdgesGeometry(other geometry, degree(相邻的两个面的法线如果大于degree，就画出这两个面的共线))
+			var edges = new THREE.EdgesGeometry(shapeGeo, 0);
+			// 线框类型 WireframeGeometry(other geometry)
+			var wireFrames = new THREE.WireframeGeometry(shapeGeo);
+			var lineMeshObj = new THREE.LineSegments(edges /*or wireFrames*/, new THREE.LineBasicMaterial( { color: 0xff00ff } ) );
+			//scene.add(lineMeshObj);
+
+
+			// object的样貌
+			var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+			// 创建这个object
+			var meshObj = new THREE.Mesh(shapeGeo, material);
+			// 加入场景世界
+			scene.add(meshObj);
+
+			
+			// 创建相机，配置好参数
+			var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+			camera.position.z = 5;
+
+			var loop = function () {
+				requestAnimationFrame(loop);
+				// 用眼睛来观察这个世界，不断观察，用不停歇
+				meshObj.rotation.x += 0.01
+				meshObj.rotation.y += 0.01
+				renderer.render(scene, camera);
+			};
+			loop();
+		</script>
+	</body>
+</html>
