@@ -1,0 +1,112 @@
+<html>
+	<head>
+		<title>Material example</title>
+		<style>
+			body {margin: 0;}
+			canvas {width: 100%; height: 100%}
+		</style>
+	</head>
+	<body>
+		<script src="lib/three.min.js"></script>
+		<script>
+			// 创建渲染器
+			var renderer = new THREE.WebGLRenderer({antialias:true});
+			//renderer.shadowMap.enabled = true;
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.setClearColor(0xffffff);
+			//让浏览器找到这个画布
+			document.body.appendChild(renderer.domElement); 
+			// 创建场景世界
+			var scene = new THREE.Scene();
+			// 加灯光
+			var dirLight = new THREE.DirectionalLight(0xffffff);
+			dirLight.position.set(1, 1, 1).normalize();
+			scene.add(dirLight);
+			
+			// geometry 1: Sphere
+			var geo1 = new THREE.SphereBufferGeometry(7, 7, 7);
+			// geometry 2: Heart Shape
+			var x = 0, y = 0;
+			var heartShape = new THREE.Shape();
+			heartShape.moveTo( x + 5, y + 5 );
+			heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
+			heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
+			heartShape.bezierCurveTo( x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19 );
+			heartShape.bezierCurveTo( x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7 );
+			heartShape.bezierCurveTo( x + 16, y + 7, x + 16, y, x + 10, y );
+			heartShape.bezierCurveTo( x + 7, y, x + 5, y + 5, x + 5, y + 5 );
+			var extrudeSettings = {
+				steps: 5,
+				depth: 15,
+				bevelEnabled: true,
+				bevelThickness: 1,
+				bevelSize: 1,
+				bevelSegments: 1
+			};
+			var geo2 = new THREE.ExtrudeBufferGeometry(heartShape, extrudeSettings);
+			var matColor = new THREE.Color(0xaaaa00);
+			// object的材质
+			/*
+			var mat = new THREE.MeshBasicMaterial({ 
+				color: matColor,
+				wireframe: false,
+				wireframeLinewidth: 2,
+				map:null,
+				side: THREE.backSide,
+				});
+			*/
+			/*	
+			var mat = new THREE.MeshLambertMaterial({
+				color: matColor,
+				emissive: 0x0000ff,	  //自发光颜色
+				emissiveIntensity:0.3,//自发光强度
+			});
+			*/
+			/*
+			var mat = new THREE.MeshPhongMaterial({
+				color: matColor,
+				wireframe: true,
+				emissive: 0x0000ff,	  //自发光颜色
+				emissiveIntensity:0.3,//自发光强度
+				specular: 0xff2020,	  //高光颜色和强度	
+				shininess: 30,		  //高光系数
+			});
+			*/
+
+			var mat = new THREE.MeshToonMaterial({
+				color: matColor,
+				emissive: 0x0000ff,	  //自发光颜色
+				emissiveIntensity:0.3,//自发光强度
+				specular: 0xff2020,	  //高光颜色和强度	
+				shininess: 30,		  //高光系数
+			});
+			
+
+			//var mat = new THREE.MeshNormalMaterial();
+			//var mat = new THREE.MeshDepthMaterial();
+
+			var meshObj1 = new THREE.Mesh(geo1, mat);
+			meshObj1.position.set(-15, 0, 0);
+			scene.add(meshObj1);
+			var meshObj2 = new THREE.Mesh(geo2, mat);
+			meshObj2.position.set(15, -5, -10);
+			scene.add(meshObj2);
+
+			var meshObjs = [meshObj1, meshObj2];
+			// 创建相机，配置好参数
+			var camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 100);
+			camera.position.set(0, 20, 40);
+			camera.rotation.x = -0.4;
+
+			var loop = function () {
+				requestAnimationFrame(loop);
+				for (var i = 0; i < meshObjs.length; i++) {
+					meshObjs[i].rotation.y += 0.002
+				}
+				// 用眼睛来观察这个世界，不断观察，永不停歇
+				renderer.render(scene, camera);
+			};
+			loop();
+		</script>
+	</body>
+</html>
